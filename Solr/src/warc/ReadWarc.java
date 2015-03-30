@@ -20,7 +20,7 @@ import org.jsoup.nodes.Element;
 public class ReadWarc {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, SolrServerException {
-		String inputWarcFile="08.warc.gz";
+		String inputWarcFile="04.warc.gz";
 		// open our gzip input stream
 		GZIPInputStream gzInputStream=new GZIPInputStream(new FileInputStream(inputWarcFile));
 
@@ -70,11 +70,8 @@ public class ReadWarc {
 				try{
 					testoHtml = testo.substring(testo.indexOf("<"));
 				}catch (Exception e) {
-					System.out.println(testo);
-					/*
-					 * DEVO PRENDERE DA DOPO Content-Length: xxxx piu' la riga di a capo
-					 */
-					testoHtml= "<html><body>NULL</body></html>";
+					testoHtml = testo.substring(testo.indexOf("Content-Length:"));
+					testoHtml = testoHtml.replaceFirst("Content-Length: [0-9]+", "").trim();
 				}
 
 				Document doc = Jsoup.parse(testoHtml);
@@ -82,7 +79,7 @@ public class ReadWarc {
 				String title = doc.title();
 				i++;
 				if(i%1000==0) {
-					Indexer.add(title, body.text(), thisTargetURI, testoHtml);;
+					Indexer.add(title.trim(), body.text().trim(), thisTargetURI, testoHtml);;
 					System.out.println(i/1000);
 				}
 			}
