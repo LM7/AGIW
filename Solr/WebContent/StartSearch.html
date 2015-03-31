@@ -75,7 +75,15 @@
     
     
     function cutUrl(url) {
-        
+        url_corto = "";
+        if (url.length > 60) {
+            url_corto = url.substring(0,60);
+            url_corto += "...";
+        }
+        else {
+            url_corto = url;
+        }
+        return url_corto;
     }
     
     function xmlhttpPost(strURL) {
@@ -108,6 +116,7 @@
             , 'indent=on'
             , 'hl=true'
             , 'hl.fl=name,features'
+            , 'rows=50'
             ];
         
         return params;
@@ -123,34 +132,76 @@
 
     // this function does all the work of parsing the solr response and updating the page.
     function updatepage(str){
+        var k = 1;
         alert(str);
         var json = JSON.parse(str);
         //document.getElementById("raw").innerHTML = str; STAMPA I RISULTATI DI SOLR
         var rsp = eval("("+str+")"); // use eval to parse Solr's JSON response
-        var stampata= '<br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
+        var stampata= '<div id="Stampa1"> <br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
         var array;
         //GESTIONE DEL RISULTATO
         var numeroRisultati = rsp.response.numFound;
         if (numeroRisultati > 0) { //name-> titolo; price-> sito; price_c->body
-            stampata += "<ul>";
-            for (i = 0; i < numeroRisultati; i++) {
-                array = cutTitleBody(json.response.docs[i].title,json.response.docs[i].body);
-                titleLittle = array[0];
-                bodyLittle = array[1];
-                stampata += '<li> <h4  style="color:#0000FF; margin-bottom:-10px;"> <strong>' + titleLittle +'</strong> </h4> </li>';
-                stampata += '<h6 style="color:#228B22; margin-bottom:-5px;"> <ins> <a style="color:#228B22;" href='+ json.response.docs[i].url +'>'+json.response.docs[i].url+'</a> </ins> </h6> ';
-                stampata += ' <h5 style="color:#000000; margin-bottom:20px;">'+ bodyLittle +'</h5> ';
-                
+            stampata += '<ul>';
+            for (i = 0; (i < numeroRisultati) && (i<8) && (k<7); i++) { // OTTOOOOOOOOOOOOOOO
+                 array = cutTitleBody(json.response.docs[i].title,json.response.docs[i].body);
+                 titleLittle = array[0];
+                 bodyLittle = array[1];
+                 urlLittle = cutUrl(json.response.docs[i].url);
+                 stampata += '<li> <h4  style="color:#0000FF; margin-bottom:-10px;"> <strong>' + titleLittle +'</strong> </h4> </li>';
+                 stampata += '<h6 style="color:#228B22; margin-bottom:-5px;"> <ins> <a style="color:#228B22;" href='+ json.response.docs[i].url +'>'+urlLittle+'</a> </ins> </h6>';
+                 stampata += '<h5 style="color:#000000; margin-bottom:20px;">'+ bodyLittle +'</h5>';
+               
             }
-            stampata += "</ul>";
+            stampata += "</ul> </div>";
+            document.getElementById("result").innerHTML = stampata;
+            if (i == 8) { // OTTOOOOOOOOOOOOOOO
+                k = 2;
+                finitiRisultati = false;
+                while (k<7 && !finitiRisultati) {
+                    stampataNew = '<div style="display:none" id="Stampa'+k+'"> <br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>';
+                    stampataNew += '<ul>';
+                    for (j=i; (j < numeroRisultati) && (j<i+8); j++) {
+                         array = cutTitleBody(json.response.docs[j].title,json.response.docs[j].body);
+                         titleLittle = array[0];
+                         bodyLittle = array[1];
+                         urlLittle = cutUrl(json.response.docs[j].url);
+                         stampataNew += '<li> <h4  style="color:#0000FF; margin-bottom:-10px;"> <strong>' + titleLittle +'</strong> </h4> </li>';
+                         stampataNew += '<h6 style="color:#228B22; margin-bottom:-5px;"> <ins> <a style="color:#228B22;" href='+ json.response.docs[j].url +'>'+urlLittle+'</a> </ins> </h6> ';
+                         stampataNew += ' <h5 style="color:#000000; margin-bottom:20px;">'+ bodyLittle +'</h5> ';
+                    }
+                    stampataNew += "</ul> </div>";
+                    document.getElementById("result").innerHTML += stampataNew;
+                    if ( (j >= (i+8)) && (numeroRisultati> (i+8)) ) {
+                        k = k+1;              
+                    }
+                    else {
+                        finitiRisultati = true;
+                    }
+                    i = j;
+                }//chiude il while
+                
+            } //chiude l'if con i==8      
         }
         else {
-            stampata += ' <h1 style="color:#FF0000"> &nbsp  NESSUN RISULTATO </h1>';
+            stampata += ' <h1 style="color:#FF0000"> &nbsp  NESSUN RISULTATO </h1> </div>';
+            document.getElementById("result").innerHTML = stampata;
+            k = 0;
+        }
+        
+        //creo bottoni in base alle pagine-> al massimo sei
+        var pagine = k;
+        for (z=1; z <= pagine; z++ ) {
+            event.preventDefault();
+            var id = 'button'+z;
+            var buttonUno = document.getElementById(id);
+            $(buttonUno).show();
         }
         
      
        
-        document.getElementById("result").innerHTML = stampata;
+        
+        
         event.preventDefault();
         var imgPrincipal = document.getElementById('imgSearch');
         $(imgPrincipal).hide();
@@ -160,6 +211,98 @@
         
         
     }
+    </script>
+    
+    
+    
+    
+    <button id="button1" style="margin-left:900px; margin-top: 100px; display:none" type="button" class="btn btn-info">1</button>
+    <button id="button2" style="margin-top: 100px; display:none" type="button" class="btn btn-info">2</button>
+    <button id="button3" style="margin-top: 100px; display:none" type="button" class="btn btn-info">3</button>
+    <button id="button4" style="margin-top: 100px; display:none" type="button" class="btn btn-info">4</button>
+    <button id="button5" style="margin-top: 100px; display:none" type="button" class="btn btn-info">5</button>
+    <button id="button6" style="margin-top: 100px; display:none" type="button" class="btn btn-info">6</button>
+    
+    <script>
+    $("#button1").click(function() {
+        event.preventDefault();
+        var pagUno = document.getElementById('Stampa1');
+        $(pagUno).show();
+        for (i=2; i<7; i++) {
+            event.preventDefault();
+            var nascondiPagina = document.getElementById('Stampa'+i);
+            $(nascondiPagina).hide();
+        }
+    });
+    
+    $("#button2").click(function() {
+        event.preventDefault();
+        var pagDue = document.getElementById('Stampa2');
+        $(pagDue).show();
+        for (i=1; i<7; i++) {
+            if (i!=2) {
+                event.preventDefault();
+                var nascondiPagina = document.getElementById('Stampa'+i);
+                $(nascondiPagina).hide();
+            } 
+        }
+    });
+    
+    $("#button3").click(function() {
+        event.preventDefault();
+        var pagTre = document.getElementById('Stampa3');
+        $(pagTre).show();
+        for (i=1; i<7; i++) {
+            if (i!=3) {
+                event.preventDefault();
+                var nascondiPagina = document.getElementById('Stampa'+i);
+                $(nascondiPagina).hide();
+            } 
+        }
+    });
+    
+    $("#button4").click(function() {
+        event.preventDefault();
+        var pagQuattro = document.getElementById('Stampa4');
+        $(pagQuattro).show();
+        for (i=1; i<7; i++) {
+            if (i!=4) {
+                event.preventDefault();
+                var nascondiPagina = document.getElementById('Stampa'+i);
+                $(nascondiPagina).hide();
+            } 
+        }
+    });
+    
+    $("#button5").click(function() {
+        event.preventDefault();
+        var pagCinque = document.getElementById('Stampa5');
+        $(pagCinque).show();
+        for (i=1; i<7; i++) {
+            if (i!=5) {
+                event.preventDefault();
+                var nascondiPagina = document.getElementById('Stampa'+i);
+                $(nascondiPagina).hide();
+            } 
+        }
+    });
+    
+    $("#button6").click(function() {
+        event.preventDefault();
+        var pagSei = document.getElementById('Stampa6');
+        $(pagSei).show();
+        for (i=1; i<7; i++) {
+            if (i!=6) {
+                event.preventDefault();
+                var nascondiPagina = document.getElementById('Stampa'+i);
+                $(nascondiPagina).hide();
+            } 
+        }
+    });
+    
+    
+    
+    
     </script>
 
 </body>
