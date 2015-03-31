@@ -1,4 +1,6 @@
 package main;
+import java.applet.Applet;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -13,46 +15,65 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
 
-
-
 @SuppressWarnings("deprecation")
-public class Query {
+public class Query extends Applet{
 	static HttpSolrServer server = new HttpSolrServer("http://localhost:8080/collection1/");
 	static SolrQuery query = new SolrQuery();
+	
+	public static void main(String[] args) throws SolrServerException, IOException {
+		String[] r = doSearch("soup sausage");
+		System.out.println("RISULTATI IN AND: "+r[0]+"\n");
+		System.out.println("RISULTATI IN OR: "+r[1]+"\n");
+		System.out.println("QUERY: "+r[2]);
+	}
+	
+	public static String[] doSearch(String keywords) throws SolrServerException {
 
-	public static void main(String[] args) throws SolrServerException {
-
-		String keywords = "*.*";
+		/* 
+		 * result[0]= risultati in AND
+		 * result[1]= risultati in OR
+		 * result[2]= eventuale query se Mispelling
+		 */
+		String[] result = new String[3];
+	
+		System.out.println("\n----------------------------------------------------------------------------------------------------------------");
+		System.out.println("RISULTATI con QUERY ORIGINALE");
+		QueryResponse resultQueryQ1 = doQuery(keywords,"AND");
+		SolrDocumentList q1List = resultQueryQ1.getResults();
+		System.out.println("== AND ===");
+		//printResult(q1List);
+		System.out.println("\n-----------------------------------------------------------");
+		QueryResponse resultQueryQ3 = doQuery(keywords,"OR");
+		SolrDocumentList q3List = resultQueryQ3.getResults();
+		System.out.println("== OR ===");
+		//printResult(q3List);
+		System.out.println("\n----------------------------------------------------------------------------------------------------------------");
+		System.out.println("RISULTATI con QUERY MODIFICATA DAL MISPELLING");
+		QueryResponse resultQueryQ2 = checkMispelling(keywords, "AND");
+		SolrDocumentList q2List = resultQueryQ2.getResults();
+		System.out.println("== AND ===");
+		//printResult(q2List);
+		System.out.println("\n-----------------------------------------------------------");
+		QueryResponse resultQueryQ4 = checkMispelling(keywords, "OR");
+		SolrDocumentList q4List = resultQueryQ4.getResults();
+		System.out.println("== OR ===");
+		//printResult(q4List);
+		System.out.println("\n----------------------------------------------------------------------------------------------------------------");
 		
-		SolrDocumentList resultQueryQ1 = doQuery(keywords,"AND");
-		SolrDocumentList resultQueryQ3 = doQuery(keywords,"OR");
-		System.out.println("\n----------------------------------------------------------------------------------");
-		SolrDocumentList resultQueryQ2 = checkMispelling(keywords, "AND");
-		SolrDocumentList resultQueryQ4 = checkMispelling(keywords, "OR");
-		System.out.println("\n----------------------------------------------------------------------------------");
-		
-		SolrDocumentList s = new SolrDocumentList();
-		s.addAll(resultQueryQ1);
-		s.addAll(resultQueryQ3);
-		
-		SolrDocumentList s2 = new SolrDocumentList();
-		s2.addAll(resultQueryQ2);
-		s2.addAll(resultQueryQ4);
-		
-		
-		if(s.size()>=s2.size()) {
-			System.out.println("Maggiori risultati con la query corretta (#"+s.size()+")");
-			System.out.println("(#mispellng: "+s2.size()+")");
-			printResult(s);
+		if((q1List.size()+q3List.size())>=(q2List.size()+q4List.size())) {
+			result[0]=resultQueryQ1.toString();
+			result[1]=resultQueryQ3.toString();
+			result[2]="";
 		}
 		else {
-			System.out.println("Maggiori risultati con la query mispelling (#"+s2.size()+")");
-			System.out.println("(#corrette: "+s.size()+")");
-			printResult(s2);
+			result[0]=resultQueryQ2.toString();
+			result[1]=resultQueryQ4.toString();
+			result[2]="";
 		}
+		return result;
 	}
 
-	public static SolrDocumentList checkMispelling(String keywords, String operator) {
+	public static QueryResponse checkMispelling(String keywords, String operator) {
 		/*settaggio parametri per il mispelling*/
 		ModifiableSolrParams params = new ModifiableSolrParams();
 		params.set("qt", "/spell");
@@ -75,21 +96,18 @@ public class Query {
 		SpellCheckResponse spellCheckResponse = response.getSpellCheckResponse();
 		//System.out.println("SpellCheckResponse: "+spellCheckResponse+"\n=========================\n");
 		if (spellCheckResponse!=null && !spellCheckResponse.isCorrectlySpelled()) {
-			System.out.println("\n==== Dejavu? [Forse Cercavi]====");
+			System.out.println("FORSE CERCAVI: \n");
 			for (Suggestion suggestion : response.getSpellCheckResponse().getSuggestions()) {
 				System.out.println("original token: " + suggestion.getToken() + " - alternatives: " + suggestion.getAlternatives());
 				alternativesForWord = suggestion.getAlternatives();
 				keywords = keywords.replaceAll(suggestion.getToken(), alternativesForWord.get(0));
 			}
-			System.out.println("================================");
 		}
-		
-		SolrDocumentList resultQuery = doQuery(keywords,operator);
+		QueryResponse resultQuery = doQuery(keywords,operator);
 		return resultQuery;
 	}
 	
-	
-	public static SolrDocumentList doQuery(String keywords, String operator) {
+	public static QueryResponse doQuery(String keywords, String operator) {
 		String searchString="";
 
 		if(!keywords.contains(" ")) {
@@ -104,17 +122,18 @@ public class Query {
 		QueryResponse rsp = null;
 		try {
 			rsp = server.query(query);
+			//System.out.println("SERVER RESPONSE: "+rsp);
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		SolrDocumentList resultQuery = rsp.getResults();
-		return resultQuery;
+		//SolrDocumentList resultQuery = rsp.getResults();
+		return rsp;
 	}
 	
 	/*stampa eventuali risultati presenti*/
 	public static void printResult(SolrDocumentList resultQuery) {
-		System.out.println("==== Risultati ====");
+		System.out.println("---> Risultati <---");
 		if(!resultQuery.isEmpty()) {
 			Iterator<SolrDocument> iter = resultQuery.iterator();
 			while (iter.hasNext()) {
