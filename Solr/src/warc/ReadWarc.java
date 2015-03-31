@@ -78,9 +78,14 @@ public class ReadWarc {
 				Element body = doc.body();
 				String title = doc.title();
 				i++;
+
 				if(i%1000==0) {
-					Indexer.add(title.trim(), body.text().trim(), thisTargetURI, testoHtml);;
-					System.out.println(i/1000);
+					if(body!= null) {
+						if(title == null)
+							title = "";
+						Indexer.add(title.trim(), body.text().trim(), thisTargetURI, testoHtml);;
+						System.out.println(i);
+					}
 				}
 			}
 		}
