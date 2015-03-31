@@ -90,9 +90,9 @@
         if (numeroRisultati > 0) { //name-> titolo; price-> sito; price_c->body
             stampata += "<ul>";
             for (i = 0; i < numeroRisultati; i++) {
-                stampata += '<li> <h4  style="color:#0000FF; margin-bottom:-10px;"> <strong> Titolo: ' + json.response.docs[i].name +'</strong> </h4> </li>';
-                stampata += '<h6 style="color:#228B22; margin-bottom:-5px;"> <ins> Sito: '+ json.response.docs[i].price +'</ins> </h6> ';
-                stampata += ' <h5 style="color:#000000; margin-bottom:20px;"> Body: '+ json.response.docs[i].price_c +'</h5> ';
+                stampata += '<li> <h4  style="color:#0000FF; margin-bottom:-10px;"> <strong>' + json.response.docs[i].title +'</strong> </h4> </li>';
+                stampata += '<h6 style="color:#228B22; margin-bottom:-5px;"> <ins> <a style="color:#228B22;" href='+ json.response.docs[i].url +'>'+json.response.docs[i].url+'</a> </ins> </h6> ';
+                stampata += ' <h5 style="color:#000000; margin-bottom:20px;">'+ json.response.docs[i].body +'</h5> ';
                 
             }
             stampata += "</ul>";
