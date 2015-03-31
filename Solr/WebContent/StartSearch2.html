@@ -91,7 +91,8 @@
     function select_spell_ok(str_json_spell,str_json_select,q_old){
     	var json = JSON.parse(str_json_spell);
         q="";
-        if (json.spellcheck.suggestions!=null) { 
+        if (json.spellcheck.suggestions.length !=0) { 
+        	alert(json.spellcheck.suggestions[0]);
         	var q_old_parole = q_old.split(" ");
         	q=q_old;
             i=0;
@@ -160,6 +161,7 @@
             , 'indent=on'
             , 'hl=true'
             , 'hl.fl=name,features'
+            , 'rows=50'
             ];
         
         return params;
