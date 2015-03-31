@@ -36,15 +36,10 @@
     
     <script>
     function select() {
-    	alert('inizio');
-    	//var str_jsonSpell = 
     	xmlhttpPost_select("/collection1/select");
-    	//xmlhttpPost_spell("/collection1/spell");
-    	//updatepage(str_jsonSpell);
     }
     
     function xmlhttpPost_select(strURL) {
-        //alert("xml");
         var xmlHttpReq = false;
         var self = this;
         if (window.XMLHttpRequest) { // Mozilla/Safari
@@ -57,7 +52,7 @@
         self.xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         self.xmlHttpReq.onreadystatechange = function() {
             if (self.xmlHttpReq.readyState == 4) {
-                select_ok(self.xmlHttpReq.responseText); // qui
+                select_ok(self.xmlHttpReq.responseText,document.forms['f1'].query.value); // qui
             }
         }  
 
@@ -66,13 +61,12 @@
         self.xmlHttpReq.send(strData);
     }
     
-    function select_ok(str_json_select){
+    function select_ok(str_json_select,q_old){
     	//updatepage(str_json_select);
-    	xmlhttpPost_spell("/collection1/spell",str_json_select);
+    	xmlhttpPost_spell("/collection1/spell",str_json_select,q_old);
     }
     
-    function xmlhttpPost_spell(strURL,str_json_select) {
-        alert("xml");
+    function xmlhttpPost_spell(strURL,str_json_select,q_old) {
         var xmlHttpReq = false;
         var self = this;
         if (window.XMLHttpRequest) { // Mozilla/Safari
@@ -85,7 +79,7 @@
         self.xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         self.xmlHttpReq.onreadystatechange = function() {
             if (self.xmlHttpReq.readyState == 4) {
-                select_spell_ok(self.xmlHttpReq.responseText,str_json_select); // qui
+                select_spell_ok(self.xmlHttpReq.responseText,str_json_select,q_old); // qui
             }
         }  
 
@@ -94,25 +88,33 @@
         self.xmlHttpReq.send(strData);
     }
     
-    function select_spell_ok(str_json_spell,str_json_select){
+    function select_spell_ok(str_json_spell,str_json_select,q_old){
     	var json = JSON.parse(str_json_spell);
-        alert("aa");
         q="";
         if (json.spellcheck.suggestions!=null) { 
+        	var q_old_parole = q_old.split(" ");
+        	q=q_old;
             i=0;
             while (json.spellcheck.suggestions[i]!=null) {
-            	i++;
-                q += json.spellcheck.suggestions[i].suggestion[0] + ' ';
-                i++;
-              }
+            	k=0;
+            	while(q_old_parole[k]!=null) {
+	            	if(q_old_parole[k]==(json.spellcheck.suggestions[i])) {
+	            		i++;
+	                	q = q.replace(q_old_parole[k],json.spellcheck.suggestions[i].suggestion[0]);
+	                	break;
+	            	}
+	            	k++;
+	           }
+	           i++;
+           }
         }
-        alert('a');
+        alert('vecchia '+q_old);
+        alert('nuova '+q);
         xmlhttpPost_ReSelect("/collection1/select",q,str_json_select)
         
     }
     
     function xmlhttpPost_ReSelect(strURL,q,str_json_select_old) {
-        //alert("xml");
         var xmlHttpReq = false;
         var self = this;
         if (window.XMLHttpRequest) { // Mozilla/Safari
@@ -194,10 +196,12 @@
         if (numeroRisultati > 0) { //name-> titolo; price-> sito; price_c->body
             stampata += "<ul>";
             for (i = 0; i < numeroRisultati; i++) {
-                stampata += '<li> <h4  style="color:#0000FF; margin-bottom:-10px;"> <strong>' + json.response.docs[i].title +'</strong> </h4> </li>';
+                array = cutTitleBody(json.response.docs[i].title,json.response.docs[i].body);
+                titleLittle = array[0];
+                bodyLittle = array[1];
+                stampata += '<li> <h4  style="color:#0000FF; margin-bottom:-10px;"> <strong>' + titleLittle +'</strong> </h4> </li>';
                 stampata += '<h6 style="color:#228B22; margin-bottom:-5px;"> <ins> <a style="color:#228B22;" href='+ json.response.docs[i].url +'>'+json.response.docs[i].url+'</a> </ins> </h6> ';
-                stampata += ' <h5 style="color:#000000; margin-bottom:20px;">'+ json.response.docs[i].body +'</h5> ';
-                
+                stampata += ' <h5 style="color:#000000; margin-bottom:20px;">'+ bodyLittle +'</h5> ';         
             }
             stampata += "</ul>";
         }
@@ -227,6 +231,44 @@
         $(imgLittle).show();
         
         
+    }
+    
+    function cutTitleBody(titolo, body) {
+        var body_corto = "";  
+        var titolo_corto = "";
+        if(titolo!="") {
+            parole_titolo = titolo.split(" ", 11); //String[]
+            for(i=0;i<10 && i<parole_titolo.length;i++) {
+                titolo_corto += parole_titolo[i] + " ";
+            }
+            if(parole_titolo.length>10)
+                titolo_corto += "...";
+            
+            parole_body = body.split(" ", 21); //String[]
+            for(i=0;i<20 && i<parole_body.length;i++) {
+                body_corto += parole_body[i] + " ";
+            }
+            if(parole_body.length>20)
+                body_corto += "...";
+        }
+        else {
+            parole_body = body.split(" ", 31); //String[]
+            var i;
+            for(i=0;i<10 && i<parole_body.length;i++) {
+                titolo_corto += parole_body[i] + " ";
+            }
+            if(parole_body.length>10)
+                titolo_corto += "...";
+            
+            while(i<30 && i<parole_body.length){
+                body_corto += parole_body[i] + " ";
+                i++;
+            }
+            if(parole_body.length>30)
+                body_corto += "...";
+        }
+        var titleBodyLittle = [titolo_corto, body_corto];
+        return titleBodyLittle;
     }
     </script>
 
