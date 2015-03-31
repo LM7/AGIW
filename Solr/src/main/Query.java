@@ -36,29 +36,29 @@ public class Query extends Applet{
 		 */
 		String[] result = new String[3];
 	
-		System.out.println("\n----------------------------------------------------------------------------------------------------------------");
-		System.out.println("RISULTATI con QUERY ORIGINALE");
+		//System.out.println("\n----------------------------------------------------------------------------------------------------------------");
+		//System.out.println("RISULTATI con QUERY ORIGINALE");
 		QueryResponse resultQueryQ1 = doQuery(keywords,"AND");
 		SolrDocumentList q1List = resultQueryQ1.getResults();
-		System.out.println("== AND ===");
+		//System.out.println("== AND ===");
 		//printResult(q1List);
-		System.out.println("\n-----------------------------------------------------------");
+		//System.out.println("\n-----------------------------------------------------------");
 		QueryResponse resultQueryQ3 = doQuery(keywords,"OR");
 		SolrDocumentList q3List = resultQueryQ3.getResults();
-		System.out.println("== OR ===");
+		//System.out.println("== OR ===");
 		//printResult(q3List);
-		System.out.println("\n----------------------------------------------------------------------------------------------------------------");
-		System.out.println("RISULTATI con QUERY MODIFICATA DAL MISPELLING");
+		//System.out.println("\n----------------------------------------------------------------------------------------------------------------");
+		//System.out.println("RISULTATI con QUERY MODIFICATA DAL MISPELLING");
 		QueryResponse resultQueryQ2 = checkMispelling(keywords, "AND");
 		SolrDocumentList q2List = resultQueryQ2.getResults();
-		System.out.println("== AND ===");
+		//System.out.println("== AND ===");
 		//printResult(q2List);
-		System.out.println("\n-----------------------------------------------------------");
+		//System.out.println("\n-----------------------------------------------------------");
 		QueryResponse resultQueryQ4 = checkMispelling(keywords, "OR");
 		SolrDocumentList q4List = resultQueryQ4.getResults();
-		System.out.println("== OR ===");
+		//System.out.println("== OR ===");
 		//printResult(q4List);
-		System.out.println("\n----------------------------------------------------------------------------------------------------------------");
+		//System.out.println("\n----------------------------------------------------------------------------------------------------------------");
 		
 		if((q1List.size()+q3List.size())>=(q2List.size()+q4List.size())) {
 			result[0]=resultQueryQ1.toString();
@@ -96,9 +96,9 @@ public class Query extends Applet{
 		SpellCheckResponse spellCheckResponse = response.getSpellCheckResponse();
 		//System.out.println("SpellCheckResponse: "+spellCheckResponse+"\n=========================\n");
 		if (spellCheckResponse!=null && !spellCheckResponse.isCorrectlySpelled()) {
-			System.out.println("FORSE CERCAVI: \n");
+			//System.out.println("FORSE CERCAVI: \n");
 			for (Suggestion suggestion : response.getSpellCheckResponse().getSuggestions()) {
-				System.out.println("original token: " + suggestion.getToken() + " - alternatives: " + suggestion.getAlternatives());
+			//	System.out.println("original token: " + suggestion.getToken() + " - alternatives: " + suggestion.getAlternatives());
 				alternativesForWord = suggestion.getAlternatives();
 				keywords = keywords.replaceAll(suggestion.getToken(), alternativesForWord.get(0));
 			}
@@ -116,7 +116,7 @@ public class Query extends Applet{
 		else {
 			searchString = keywords.replaceAll(" ", " "+operator+" ");
 		}
-		System.out.println("\nSEARCH STRING: "+searchString);
+		//System.out.println("\nSEARCH STRING: "+searchString);
 		query.setQuery(searchString);
 
 		QueryResponse rsp = null;
