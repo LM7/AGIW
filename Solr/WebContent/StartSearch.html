@@ -34,6 +34,50 @@
 </form>
     
     <script>
+    function cutTitleBody(titolo, body) {
+        var body_corto = "";  
+        var titolo_corto = "";
+        if(titolo!="") {
+            parole_titolo = titolo.split(" ", 11); //String[]
+            for(i=0;i<10 && i<parole_titolo.length;i++) {
+                titolo_corto += parole_titolo[i] + " ";
+            }
+            if(parole_titolo.length>10)
+                titolo_corto += "...";
+            
+            parole_body = body.split(" ", 21); //String[]
+            for(i=0;i<20 && i<parole_body.length;i++) {
+                body_corto += parole_body[i] + " ";
+            }
+            if(parole_body.length>20)
+                body_corto += "...";
+        }
+        else {
+            parole_body = body.split(" ", 31); //String[]
+            var i;
+            for(i=0;i<10 && i<parole_body.length;i++) {
+                titolo_corto += parole_body[i] + " ";
+            }
+            if(parole_body.length>10)
+                titolo_corto += "...";
+            
+            while(i<30 && i<parole_body.length){
+                body_corto += parole_body[i] + " ";
+                i++;
+            }
+            if(parole_body.length>30)
+                body_corto += "...";
+        }
+        var titleBodyLittle = [titolo_corto, body_corto];
+        return titleBodyLittle;
+    }
+    
+    
+    
+    function cutUrl(url) {
+        
+    }
+    
     function xmlhttpPost(strURL) {
         //alert("xml");
         var xmlHttpReq = false;
@@ -84,15 +128,18 @@
         //document.getElementById("raw").innerHTML = str; STAMPA I RISULTATI DI SOLR
         var rsp = eval("("+str+")"); // use eval to parse Solr's JSON response
         var stampata= '<br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
-        
+        var array;
         //GESTIONE DEL RISULTATO
         var numeroRisultati = rsp.response.numFound;
         if (numeroRisultati > 0) { //name-> titolo; price-> sito; price_c->body
             stampata += "<ul>";
             for (i = 0; i < numeroRisultati; i++) {
-                stampata += '<li> <h4  style="color:#0000FF; margin-bottom:-10px;"> <strong>' + json.response.docs[i].title +'</strong> </h4> </li>';
+                array = cutTitleBody(json.response.docs[i].title,json.response.docs[i].body);
+                titleLittle = array[0];
+                bodyLittle = array[1];
+                stampata += '<li> <h4  style="color:#0000FF; margin-bottom:-10px;"> <strong>' + titleLittle +'</strong> </h4> </li>';
                 stampata += '<h6 style="color:#228B22; margin-bottom:-5px;"> <ins> <a style="color:#228B22;" href='+ json.response.docs[i].url +'>'+json.response.docs[i].url+'</a> </ins> </h6> ';
-                stampata += ' <h5 style="color:#000000; margin-bottom:20px;">'+ json.response.docs[i].body +'</h5> ';
+                stampata += ' <h5 style="color:#000000; margin-bottom:20px;">'+ bodyLittle +'</h5> ';
                 
             }
             stampata += "</ul>";
@@ -101,20 +148,9 @@
             stampata += ' <h1 style="color:#FF0000"> &nbsp  NESSUN RISULTATO </h1>';
         }
         
-        /*Stampa altri dati prima dei risultati
-        var first = rsp.response.docs[0]; 
-        html += "<br>product name="+ first.name;
-        var hl=rsp.highlighting[first.id];
-        if (hl.name != null) { 
-            html += "<br>name highlighted: " + hl.name[0]; 
-        }
-        if (hl.features != null) { 
-            html += "<br>features highligted: " + hl.features[0]; 
-        }*/
+     
        
         document.getElementById("result").innerHTML = stampata;
-        //document.getElementById("result").innerHTML = html + stampata;
-        //alert("DentroUpdate");
         event.preventDefault();
         var imgPrincipal = document.getElementById('imgSearch');
         $(imgPrincipal).hide();
