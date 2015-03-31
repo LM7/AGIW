@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,7 +25,6 @@ public class Indexer {
 		doc1.addField("url", url, 1.0f);
 		doc1.addField("title", title, 1.0f);
 		doc1.addField("body",body,1.0f); //solo il body dell'html
-		doc1.addField("bodySpell", body, 1.0f);
 		doc1.addField("html", text, 1.0f);
 		
 		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
