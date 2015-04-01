@@ -133,6 +133,12 @@
     // this function does all the work of parsing the solr response and updating the page.
     function updatepage(str){
         var k = 1;
+        for (z=1; z <= 6; z++ ) {
+              event.preventDefault();
+              var id = 'button'+z;
+              var buttonUno = document.getElementById(id);
+              $(buttonUno).hide();
+        }
         //alert(str);
         var json = JSON.parse(str);
         //document.getElementById("raw").innerHTML = str; STAMPA I RISULTATI DI SOLR
@@ -187,12 +193,6 @@
             stampata += ' <h1 style="color:#0000FF"> &nbsp  NESSUN RISULTATO </h1> </div>';
             document.getElementById("result").innerHTML = stampata;
             k = 0;
-            for (z=1; z <= 6; z++ ) {
-                event.preventDefault();
-                var id = 'button'+z;
-                var buttonUno = document.getElementById(id);
-                $(buttonUno).hide();
-            }
             
         }
         
