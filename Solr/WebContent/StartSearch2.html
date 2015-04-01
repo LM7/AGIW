@@ -201,6 +201,13 @@
         	stampata+= "<form style='display:none' name='f2' onsubmit='select_base(); return false;'> <button id='dejavu' class='btn btn-default' type='submit'>"+q_old+"</button></form>";		
         }
         var k = 1;
+        //nasconde pulsanti
+        for (z=1; z <= 6; z++ ) {
+        	event.preventDefault();
+            var id = 'button'+z;
+            var buttonUno = document.getElementById(id);
+            $(buttonUno).hide();
+        }
         var json = JSON.parse(str);
         //document.getElementById("raw").innerHTML = str; STAMPA I RISULTATI DI SOLR
         var rsp = eval("("+str+")"); // use eval to parse Solr's JSON response
@@ -254,13 +261,6 @@
             stampata += ' <h1 style="color:#0000FF"> &nbsp  NESSUN RISULTATO </h1> </div>';
             document.getElementById("result").innerHTML = stampata;
             k = 0;
-            
-            for (z=1; z <= 6; z++ ) {
-                 event.preventDefault();
-                 var id = 'button'+z;
-                 var buttonUno = document.getElementById(id);
-                 $(buttonUno).hide();
-             }
         }
         
         //creo bottoni in base alle pagine-> al massimo sei
