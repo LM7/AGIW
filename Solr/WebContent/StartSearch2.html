@@ -228,6 +228,7 @@
 	
     // this function does all the work of parsing the solr response and updating the page.
     function updatepage(str_old,str_new){
+    document.getElementById("result").innerHTML = "";
         //alert(str);
         var stampata = "";
         unico = true;
@@ -304,7 +305,7 @@
                 k = 2;
                 finitiRisultati = false;
                 while (k<7 && !finitiRisultati) {
-                    stampataNew = '<div style="display:none" id="Stampa'+k+'"> <br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>';
+                    stampataNew = '<div style="display:none" id="Stampa'+k+'"> <br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Hai ottenuto ' + rsp.response.numFound +' risultati </h4>';
                     stampataNew += '<ul>';
                     for (j=i; (j < numeroRisultati) && (j<i+8); j++) {
                          array = cutTitleBody(json.response.docs[j].title,json.response.docs[j].body);
@@ -393,7 +394,7 @@
                 k = 2;
                 finitiRisultati = false;
                 while (k<7 && !finitiRisultati) {
-                    stampataNew = '<div style="display:none" id="Stampa'+k+'_old"> <br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>';
+                    stampataNew = '<div style="display:none" id="Stampa'+k+'_old"> <br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Hai ottenuto ' + rsp.response.numFound +' risultati </h4>';
                     stampataNew += '<ul>';
                     for (j=i; (j < numeroRisultati) && (j<i+8); j++) {
                          array = cutTitleBody(json.response.docs[j].title,json.response.docs[j].body);
