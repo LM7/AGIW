@@ -15,15 +15,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </head>
-<body background="">
-<img src="dejavu.png" id="imgSearch" style="margin-top:180px; margin-left: 400px; margin-bottom:-30px"/>
-<img src="dejavupiccolo.png" id="imgSearchLittle" style="margin-top:-20px; margin-left: 100px; display:none"/>
+<body background="sfondoColGirato.jpg">
+<img src="dejaGiallorosso.png" id="imgSearch" style="margin-top:180px; margin-left: 370px; margin-bottom:-70px"/>
+<img src="dejaGiallorossoPiccolo.png" id="imgSearchLittle" style="margin-top:40px; margin-left: 100px; display:none"/>
     <form  name="f1" onsubmit='xmlhttpPost("/collection1/select"); return false;'>
   <div id="mydiv" class="row">
-        <div   class="input-group" style="margin-right:400px; margin-left: 400px; margin-top: 30px">
+        <div   class="input-group" style="margin-right:400px; margin-left: 400px; margin-top: 70px">
             <input id="barraRic" name="query" type="text" class="form-control" placeholder="Search">
             <span class="input-group-btn">
-                <button id="button" class="btn btn-default" type="submit">GO</button>
+                <button id="button" class="btn btn-warning" type="submit">GO</button>
             </span>
         </div>
     </div>
@@ -133,11 +133,11 @@
     // this function does all the work of parsing the solr response and updating the page.
     function updatepage(str){
         var k = 1;
-        alert(str);
+        //alert(str);
         var json = JSON.parse(str);
         //document.getElementById("raw").innerHTML = str; STAMPA I RISULTATI DI SOLR
         var rsp = eval("("+str+")"); // use eval to parse Solr's JSON response
-        var stampata= '<div id="Stampa1"> <br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
+        var stampata= '<div id="Stampa1"> <br> <h4 style="color:#1E90FF;margin-top:0px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
         var array;
         //GESTIONE DEL RISULTATO
         var numeroRisultati = rsp.response.numFound;
@@ -184,9 +184,16 @@
             } //chiude l'if con i==8      
         }
         else {
-            stampata += ' <h1 style="color:#FF0000"> &nbsp  NESSUN RISULTATO </h1> </div>';
+            stampata += ' <h1 style="color:#0000FF"> &nbsp  NESSUN RISULTATO </h1> </div>';
             document.getElementById("result").innerHTML = stampata;
             k = 0;
+            for (z=1; z <= 6; z++ ) {
+                event.preventDefault();
+                var id = 'button'+z;
+                var buttonUno = document.getElementById(id);
+                $(buttonUno).hide();
+            }
+            
         }
         
         //creo bottoni in base alle pagine-> al massimo sei
@@ -216,12 +223,12 @@
     
     
     
-    <button id="button1" style="margin-left:900px; margin-top: 100px; display:none" type="button" class="btn btn-info">1</button>
-    <button id="button2" style="margin-top: 100px; display:none" type="button" class="btn btn-info">2</button>
-    <button id="button3" style="margin-top: 100px; display:none" type="button" class="btn btn-info">3</button>
-    <button id="button4" style="margin-top: 100px; display:none" type="button" class="btn btn-info">4</button>
-    <button id="button5" style="margin-top: 100px; display:none" type="button" class="btn btn-info">5</button>
-    <button id="button6" style="margin-top: 100px; display:none" type="button" class="btn btn-info">6</button>
+    <button id="button1" style="margin-left:900px; margin-top: 20px; display:none" type="button" class="btn btn-warning">1</button>
+    <button id="button2" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">2</button>
+    <button id="button3" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">3</button>
+    <button id="button4" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">4</button>
+    <button id="button5" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">5</button>
+    <button id="button6" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">6</button>
     
     <script>
     $("#button1").click(function() {
