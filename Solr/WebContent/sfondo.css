@@ -1,7 +1,7 @@
 @CHARSET "utf-8";
 
 body {
-    background-size: cover; /*sx orizzontale, dx verticale 1300x800Alakazam*/
+    background-size: 1400px 900px; /*sx orizzontale, dx verticale 1300x800Alakazam*/
     background-repeat: no-repeat;
 }
 

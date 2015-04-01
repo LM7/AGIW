@@ -142,11 +142,11 @@
         //alert('new'+numFound_new);
         if(numFound_old>=numFound_new) {
         	//alert('vecchi')
-        	updatepage(str_json_select_old,null,null);
+        	updatepage(str_json_select_old,null);
         }
         else {
         	//alert('nuovi');
-        	updatepage(str_json_select_new,json_old.responseHeader.params.q,json_new.responseHeader.params.q);
+        	updatepage(str_json_select_old,str_json_select_new);
         }
     }
 
@@ -181,25 +181,86 @@
         return qstr;
     }
     
-    function select_base() {
-    	alert("ciao");
-    	xmlhttpPost_select("");	
-    }
-    
 	</script>
-	<!--<form style="display:none" name="f2" onsubmit='select_base(); return false;'>
-  		<button id="button2" class="btn btn-default" type="submit">Dejavu?</button>
-	<div id="result"></div></form>-->
+		<button id="magic_button" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">dejavu</button>
 	<script>
 	
+	$("#magic_button").click(function() {
+        //nascondi documenti nuovi (con misspelling)
+        for (z=1; z <= 6; z++ ) {
+	        event.preventDefault();
+	        var id = 'Stampa'+z;
+	        var stampe = document.getElementById(id);
+	        $(stampe).hide();
+	        
+	        var idbutt = 'button'+z;
+            var buttonUno = document.getElementById(idbutt);
+            $(buttonUno).hide();
+        }
+        var idbuttd = 'magic_button';
+        var buttonUnod = document.getElementById(idbuttd);
+        $(buttonUnod).hide();
+        
+        var idcerca = 'cerca';
+        var strcerca = document.getElementById(idcerca);
+        $(strcerca).hide();
+        
+        //mostra documenti vecchi (senza misspelling)
+            for (z=1; z <= 6; z++ ) {
+		        event.preventDefault();		        
+		        var idbutt = 'button'+z+'old';
+	            var buttonUno = document.getElementById(idbutt);
+	            $(buttonUno).show();
+	        }
+	        
+	        var id = 'Stampa1_old';
+		    var stampe = document.getElementById(id);
+		    $(stampe).show();
+	        
+	        var idcerca = 'cerca_old';
+	        var strcerca = document.getElementById(idcerca);
+	        $(strcerca).show();
+    });
+	
+	
     // this function does all the work of parsing the solr response and updating the page.
-    function updatepage(str,q_old,q_new){
+    function updatepage(str_old,str_new){
         //alert(str);
         var stampata = "";
-        if(q_old!=null && q_new!=null) {
-        	stampata ='<br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Risultati relativi a '+q_new+'</h4>';
-        	stampata+= "<form style='display:none' name='f2' onsubmit='select_base(); return false;'> <button id='dejavu' class='btn btn-default' type='submit'>"+q_old+"</button></form>";		
+        unico = true;
+        if(str_new!=null) {
+        	unico = false;
+        	stampata ='<br> <h4 id="cerca" style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Risultati relativi a '+JSON.parse(str_new).responseHeader.params.q+' Cerca invece '+JSON.parse(str_old).responseHeader.params.q+'</h4>';
+        	updatepage_old(str_old);
+        	event.preventDefault();
+            var id = 'magic_button';
+            var buttonbotton = document.getElementById(id);
+            $(buttonbotton).show();
+            
+            //nascondi documenti vecchi (senza misspelling)
+            for (z=1; z <= 6; z++ ) {
+		        event.preventDefault();
+		        var id = 'Stampa'+z+'_old';
+		        var stampe = document.getElementById(id);
+		        $(stampe).hide();
+		        
+		        var idbutt = 'button'+z+'old';
+	            var buttonUno = document.getElementById(idbutt);
+	            $(buttonUno).hide();
+	        }
+	        
+	        var idcerca = 'cerca_old';
+	        var strcerca = document.getElementById(idcerca);
+	        $(strcerca).hide();
         }
+        else {
+        	str_new = str_old;
+        	event.preventDefault();
+        	var idbuttd = 'magic_button';
+        	var buttonUnod = document.getElementById(idbuttd);
+        	$(buttonUnod).hide();
+        }
+        
         var k = 1;
         //nasconde pulsanti
         for (z=1; z <= 6; z++ ) {
@@ -207,11 +268,15 @@
             var id = 'button'+z;
             var buttonUno = document.getElementById(id);
             $(buttonUno).hide();
+            
+            var idbuttold = 'button'+z+'old';
+	        var buttonUnoold = document.getElementById(idbuttold);
+	        $(buttonUnoold).hide();
         }
-        var json = JSON.parse(str);
+        var json = JSON.parse(str_new);
         //document.getElementById("raw").innerHTML = str; STAMPA I RISULTATI DI SOLR
-        var rsp = eval("("+str+")"); // use eval to parse Solr's JSON response
-        stampata += '<div id="Stampa1"> <br> <h4 style="color:#1E90FF;margin-top:0px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
+        var rsp = eval("("+str_new+")"); // use eval to parse Solr's JSON response
+        stampata += '<div id="Stampa1"> <br> <h4 style="color:#1E90FF;margin-top:0px; margin-bottom:40px"> &nbsp &nbsp Hai ottenuto ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
         var array;
         //GESTIONE DEL RISULTATO
         var numeroRisultati = rsp.response.numFound;
@@ -228,7 +293,10 @@
                
             }
             stampata += "</ul> </div>";
-            document.getElementById("result").innerHTML = stampata;
+            if(unico)
+            	document.getElementById("result").innerHTML = stampata;
+            else
+            	document.getElementById("result").innerHTML += stampata;
             if (i == 8) { // OTTOOOOOOOOOOOOOOO
                 k = 2;
                 finitiRisultati = false;
@@ -268,6 +336,95 @@
         for (z=1; z <= pagine; z++ ) {
             event.preventDefault();
             var id = 'button'+z;
+            var buttonUno = document.getElementById(id);
+            $(buttonUno).show();
+        }
+        
+     
+       
+        
+        
+        event.preventDefault();
+        var imgPrincipal = document.getElementById('imgSearch');
+        $(imgPrincipal).hide();
+        event.preventDefault();
+        var imgLittle = document.getElementById('imgSearchLittle');
+        $(imgLittle).show();
+        
+        
+    }
+    
+    
+    function updatepage_old(str_old){
+        var stampata = "";        
+        var k = 1;
+        //nasconde pulsanti
+        for (z=1; z <= 6; z++ ) {
+        	event.preventDefault();
+            var id = 'button'+z+'old';
+            var buttonUno = document.getElementById(id);
+            $(buttonUno).hide();
+        }
+        var json = JSON.parse(str_old);
+        //document.getElementById("raw").innerHTML = str; STAMPA I RISULTATI DI SOLR
+        var rsp = eval("("+str_old+")"); // use eval to parse Solr's JSON response
+        stampata += '<div id="Stampa1_old"> <br> <h4 id="cerca_old" style="color:#1E90FF;margin-top:0px; margin-bottom:40px"> &nbsp &nbsp Hai ottenuto ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
+        var array;
+        //GESTIONE DEL RISULTATO
+        var numeroRisultati = rsp.response.numFound;
+        if (numeroRisultati > 0) { //name-> titolo; price-> sito; price_c->body
+            stampata += '<ul>';
+            for (i = 0; (i < numeroRisultati) && (i<8) && (k<7); i++) { // OTTOOOOOOOOOOOOOOO
+                 array = cutTitleBody(json.response.docs[i].title,json.response.docs[i].body);
+                 titleLittle = array[0];
+                 bodyLittle = array[1];
+                 urlLittle = cutUrl(json.response.docs[i].url);
+                 stampata += '<li> <h4  style="color:#0000FF; margin-bottom:-10px;"> <strong>' + titleLittle +'</strong> </h4> </li>';
+                 stampata += '<h6 style="color:#228B22; margin-bottom:-5px;"> <ins> <a style="color:#228B22;" href='+ json.response.docs[i].url +'>'+urlLittle+'</a> </ins> </h6>';
+                 stampata += '<h5 style="color:#000000; margin-bottom:20px;">'+ bodyLittle +'</h5>';
+               
+            }
+            stampata += "</ul> </div>";
+            document.getElementById("result").innerHTML = stampata;
+            if (i == 8) { // OTTOOOOOOOOOOOOOOO
+                k = 2;
+                finitiRisultati = false;
+                while (k<7 && !finitiRisultati) {
+                    stampataNew = '<div style="display:none" id="Stampa'+k+'_old"> <br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>';
+                    stampataNew += '<ul>';
+                    for (j=i; (j < numeroRisultati) && (j<i+8); j++) {
+                         array = cutTitleBody(json.response.docs[j].title,json.response.docs[j].body);
+                         titleLittle = array[0];
+                         bodyLittle = array[1];
+                         urlLittle = cutUrl(json.response.docs[j].url);
+                         stampataNew += '<li> <h4  style="color:#0000FF; margin-bottom:-10px;"> <strong>' + titleLittle +'</strong> </h4> </li>';
+                         stampataNew += '<h6 style="color:#228B22; margin-bottom:-5px;"> <ins> <a style="color:#228B22;" href='+ json.response.docs[j].url +'>'+urlLittle+'</a> </ins> </h6> ';
+                         stampataNew += ' <h5 style="color:#000000; margin-bottom:20px;">'+ bodyLittle +'</h5> ';
+                    }
+                    stampataNew += "</ul> </div>";
+                    document.getElementById("result").innerHTML += stampataNew;
+                    if ( (j >= (i+8)) && (numeroRisultati> (i+8)) ) {
+                        k = k+1;              
+                    }
+                    else {
+                        finitiRisultati = true;
+                    }
+                    i = j;
+                }//chiude il while
+                
+            } //chiude l'if con i==8      
+        }
+        else {
+            stampata += ' <h1 style="color:#0000FF"> &nbsp  NESSUN RISULTATO </h1> </div>';
+            document.getElementById("result").innerHTML += stampata;
+            k = 0;
+        }
+        
+        //creo bottoni in base alle pagine-> al massimo sei
+        var pagine = k;
+        for (z=1; z <= pagine; z++ ) {
+            event.preventDefault();
+            var id = 'button'+z+'old';
             var buttonUno = document.getElementById(id);
             $(buttonUno).show();
         }
@@ -348,6 +505,13 @@
     <button id="button5" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">5</button>
     <button id="button6" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">6</button>
     
+    <button id="button1old" style="margin-left:900px; margin-top: 20px; display:none" type="button" class="btn btn-warning">1</button>
+    <button id="button2old" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">2</button>
+    <button id="button3old" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">3</button>
+    <button id="button4old" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">4</button>
+    <button id="button5old" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">5</button>
+    <button id="button6old" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">6</button>
+    
     <script>
     $("#button1").click(function() {
         event.preventDefault();
@@ -420,6 +584,83 @@
             if (i!=6) {
                 event.preventDefault();
                 var nascondiPagina = document.getElementById('Stampa'+i);
+                $(nascondiPagina).hide();
+            } 
+        }
+    });
+    
+    
+    $("#button1old").click(function() {
+        event.preventDefault();
+        var pagUno = document.getElementById('Stampa1old');
+        $(pagUno).show();
+        for (i=2; i<7; i++) {
+            event.preventDefault();
+            var nascondiPagina = document.getElementById('Stampa'+i+'old');
+            $(nascondiPagina).hide();
+        }
+    });
+    
+    $("#button2old").click(function() {
+        event.preventDefault();
+        var pagDue = document.getElementById('Stampa2old');
+        $(pagDue).show();
+        for (i=1; i<7; i++) {
+            if (i!=2) {
+                event.preventDefault();
+                var nascondiPagina = document.getElementById('Stampa'+i+'old');
+                $(nascondiPagina).hide();
+            } 
+        }
+    });
+    
+    $("#button3old").click(function() {
+        event.preventDefault();
+        var pagTre = document.getElementById('Stampa3old');
+        $(pagTre).show();
+        for (i=1; i<7; i++) {
+            if (i!=3) {
+                event.preventDefault();
+                var nascondiPagina = document.getElementById('Stampa'+i+'old');
+                $(nascondiPagina).hide();
+            } 
+        }
+    });
+    
+    $("#button4old").click(function() {
+        event.preventDefault();
+        var pagQuattro = document.getElementById('Stampa4old');
+        $(pagQuattro).show();
+        for (i=1; i<7; i++) {
+            if (i!=4) {
+                event.preventDefault();
+                var nascondiPagina = document.getElementById('Stampa'+i+'old');
+                $(nascondiPagina).hide();
+            } 
+        }
+    });
+    
+    $("#button5old").click(function() {
+        event.preventDefault();
+        var pagCinque = document.getElementById('Stampa5old');
+        $(pagCinque).show();
+        for (i=1; i<7; i++) {
+            if (i!=5) {
+                event.preventDefault();
+                var nascondiPagina = document.getElementById('Stampa'+i+'old');
+                $(nascondiPagina).hide();
+            } 
+        }
+    });
+    
+    $("#button6old").click(function() {
+        event.preventDefault();
+        var pagSei = document.getElementById('Stampa6old');
+        $(pagSei).show();
+        for (i=1; i<7; i++) {
+            if (i!=6) {
+                event.preventDefault();
+                var nascondiPagina = document.getElementById('Stampa'+i+'old');
                 $(nascondiPagina).hide();
             } 
         }
