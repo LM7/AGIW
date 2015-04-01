@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>DejaVuMiPiaciTu</title>
+    <title>DejaVu</title>
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
@@ -28,9 +28,12 @@
            		</span>
         	</div>
     	</div>
+    	<button id="magic_button" style="margin-top: -115px; margin-left: 1015px; display:none" type="button" class="btn btn-warning">DejaVu</button>
 	<div id="result"></div>
+	
 	<!--<pre>RISULTATI<div id="raw"></div></pre>-->
 	</form>
+	
     
     <script>
     function select() {
@@ -182,7 +185,7 @@
     }
     
 	</script>
-		<button id="magic_button" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">dejavu</button>
+		
 	<script>
 	
 	$("#magic_button").click(function() {
@@ -230,7 +233,7 @@
         unico = true;
         if(str_new!=null) {
         	unico = false;
-        	stampata ='<br> <h4 id="cerca" style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Risultati relativi a '+JSON.parse(str_new).responseHeader.params.q+' Cerca invece '+JSON.parse(str_old).responseHeader.params.q+'</h4>';
+        	stampata ='<br> <h5 id="cerca" style="color:#00008B;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Risultati relativi a <i><b>'+JSON.parse(str_new).responseHeader.params.q+'</i></b> <br> &nbsp &nbsp Cerca invece <i><b>'+JSON.parse(str_old).responseHeader.params.q+'</i></b> con il pulsante DejaVu!</h5>';                      
         	updatepage_old(str_old);
         	event.preventDefault();
             var id = 'magic_button';
@@ -276,7 +279,7 @@
         var json = JSON.parse(str_new);
         //document.getElementById("raw").innerHTML = str; STAMPA I RISULTATI DI SOLR
         var rsp = eval("("+str_new+")"); // use eval to parse Solr's JSON response
-        stampata += '<div id="Stampa1"> <br> <h4 style="color:#1E90FF;margin-top:0px; margin-bottom:40px"> &nbsp &nbsp Hai ottenuto ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
+        stampata += '<div id="Stampa1"> <br> <h4 style="color:#00008B;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Hai ottenuto ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
         var array;
         //GESTIONE DEL RISULTATO
         var numeroRisultati = rsp.response.numFound;
@@ -368,7 +371,7 @@
         var json = JSON.parse(str_old);
         //document.getElementById("raw").innerHTML = str; STAMPA I RISULTATI DI SOLR
         var rsp = eval("("+str_old+")"); // use eval to parse Solr's JSON response
-        stampata += '<div id="Stampa1_old"> <br> <h4 id="cerca_old" style="color:#1E90FF;margin-top:0px; margin-bottom:40px"> &nbsp &nbsp Hai ottenuto ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
+        stampata += '<div id="Stampa1_old"> <br> <h4 id="cerca_old" style="color:#00008B;margin-top:0px; margin-bottom:40px"> &nbsp &nbsp Hai ottenuto ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
         var array;
         //GESTIONE DEL RISULTATO
         var numeroRisultati = rsp.response.numFound;
