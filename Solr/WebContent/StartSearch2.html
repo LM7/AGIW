@@ -16,15 +16,15 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </head>
 
-<body background="">
-<img src="dejavu.png" id="imgSearch" style="margin-top:180px; margin-left: 400px; margin-bottom:-30px"/>
-<img src="dejavupiccolo.png" id="imgSearchLittle" style="margin-top:-20px; margin-left: 100px; display:none"/>
+<body background="sfondoColGirato.jpg">
+<img src="dejaGiallorosso.png" id="imgSearch" style="margin-top:180px; margin-left: 370px; margin-bottom:-70px"/>
+<img src="dejaGiallorossoPiccolo.png" id="imgSearchLittle" style="margin-top:40px; margin-left: 100px; display:none"/>
     <form  name="f1" onsubmit='select(); return false;'>
   		<div id="mydiv" class="row">
-        	<div   class="input-group" style="margin-right:400px; margin-left: 400px; margin-top: 30px">
+        	<div   class="input-group" style="margin-right:400px; margin-left: 400px; margin-top: 70px">
             	<input id="barraRic" name="query" type="text" class="form-control" placeholder="Search">
             	<span class="input-group-btn">
-                	<button id="button" class="btn btn-default" type="submit">GO</button>
+                	<button id="button" class="btn btn-warning" type="submit">GO</button>
            		</span>
         	</div>
     	</div>
@@ -34,12 +34,10 @@
     
     <script>
     function select() {
-    	alert('select');
     	xmlhttpPost_select("/collection1/select");
     }
     
     function xmlhttpPost_select(strURL) {
-    	alert('xmlhttpPost_select');
         var xmlHttpReq = false;
         var self = this;
         if (window.XMLHttpRequest) { // Mozilla/Safari
@@ -62,7 +60,6 @@
     }
     
     function select_ok(str_json_select,q_old){
-    	alert('select_ok');
     	xmlhttpPost_spell("/collection1/spell",str_json_select,q_old);
     }
     
@@ -92,7 +89,6 @@
     	var json = JSON.parse(str_json_spell);
         q="";
         if (json.spellcheck.suggestions.length !=0) { 
-        	//alert(json.spellcheck.suggestions[0]);
         	var q_old_parole = q_old.split(" ");
         	q=q_old;
             i=0;
@@ -142,14 +138,14 @@
         var numFound_old = json_old.response.numFound;
         var json_new = JSON.parse(str_json_select_new);
         var numFound_new = json_new.response.numFound;
-        alert('old'+numFound_old);
-        alert('new'+numFound_new);
+        //alert('old'+numFound_old);
+        //alert('new'+numFound_new);
         if(numFound_old>=numFound_new) {
-        	alert('vecchi')
+        	//alert('vecchi')
         	updatepage(str_json_select_old,null,null);
         }
         else {
-        	alert('nuovi');
+        	//alert('nuovi');
         	updatepage(str_json_select_new,json_old.responseHeader.params.q,json_new.responseHeader.params.q);
         }
     }
@@ -199,15 +195,16 @@
     // this function does all the work of parsing the solr response and updating the page.
     function updatepage(str,q_old,q_new){
         //alert(str);
+        var stampata = "";
         if(q_old!=null && q_new!=null) {
-        	var stampata ='<br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Risultati relativi a '+q_new+'</h4>';
-        	stampata+= "<form style='display:none' name='f2' onsubmit='select_base(); return false;'> <button id='button2' class='btn btn-default' type='submit'>Dejavu?</button></form>";		
+        	stampata ='<br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Risultati relativi a '+q_new+'</h4>';
+        	stampata+= "<form style='display:none' name='f2' onsubmit='select_base(); return false;'> <button id='dejavu' class='btn btn-default' type='submit'>"+q_old+"</button></form>";		
         }
         var k = 1;
         var json = JSON.parse(str);
         //document.getElementById("raw").innerHTML = str; STAMPA I RISULTATI DI SOLR
         var rsp = eval("("+str+")"); // use eval to parse Solr's JSON response
-        var stampata= '<div id="Stampa1"> <br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
+        stampata += '<div id="Stampa1"> <br> <h4 style="color:#1E90FF;margin-top:0px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
         var array;
         //GESTIONE DEL RISULTATO
         var numeroRisultati = rsp.response.numFound;
@@ -254,9 +251,16 @@
             } //chiude l'if con i==8      
         }
         else {
-            stampata += ' <h1 style="color:#FF0000"> &nbsp  NESSUN RISULTATO </h1> </div>';
+            stampata += ' <h1 style="color:#0000FF"> &nbsp  NESSUN RISULTATO </h1> </div>';
             document.getElementById("result").innerHTML = stampata;
             k = 0;
+            
+            for (z=1; z <= 6; z++ ) {
+                 event.preventDefault();
+                 var id = 'button'+z;
+                 var buttonUno = document.getElementById(id);
+                 $(buttonUno).hide();
+             }
         }
         
         //creo bottoni in base alle pagine-> al massimo sei
@@ -337,12 +341,12 @@
     
     
     
-    <button id="button1" style="margin-left:900px; margin-top: 100px; display:none" type="button" class="btn btn-info">1</button>
-    <button id="button2" style="margin-top: 100px; display:none" type="button" class="btn btn-info">2</button>
-    <button id="button3" style="margin-top: 100px; display:none" type="button" class="btn btn-info">3</button>
-    <button id="button4" style="margin-top: 100px; display:none" type="button" class="btn btn-info">4</button>
-    <button id="button5" style="margin-top: 100px; display:none" type="button" class="btn btn-info">5</button>
-    <button id="button6" style="margin-top: 100px; display:none" type="button" class="btn btn-info">6</button>
+    <button id="button1" style="margin-left:900px; margin-top: 20px; display:none" type="button" class="btn btn-warning">1</button>
+    <button id="button2" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">2</button>
+    <button id="button3" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">3</button>
+    <button id="button4" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">4</button>
+    <button id="button5" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">5</button>
+    <button id="button6" style="margin-top: 20px; display:none" type="button" class="btn btn-warning">6</button>
     
     <script>
     $("#button1").click(function() {
