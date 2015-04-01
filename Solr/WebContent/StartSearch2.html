@@ -20,26 +20,26 @@
 <img src="dejavu.png" id="imgSearch" style="margin-top:180px; margin-left: 400px; margin-bottom:-30px"/>
 <img src="dejavupiccolo.png" id="imgSearchLittle" style="margin-top:-20px; margin-left: 100px; display:none"/>
     <form  name="f1" onsubmit='select(); return false;'>
-  <div id="mydiv" class="row">
-        <div   class="input-group" style="margin-right:400px; margin-left: 400px; margin-top: 30px">
-            <input id="barraRic" name="query" type="text" class="form-control" placeholder="Search">
-            <span class="input-group-btn">
-                <button id="button" class="btn btn-default" type="submit">GO</button>
-            </span>
-        </div>
-    </div>
-    </div>
-  
-<div id="result"></div>
-<!--<pre>RISULTATI<div id="raw"></div></pre>-->
-</form>
+  		<div id="mydiv" class="row">
+        	<div   class="input-group" style="margin-right:400px; margin-left: 400px; margin-top: 30px">
+            	<input id="barraRic" name="query" type="text" class="form-control" placeholder="Search">
+            	<span class="input-group-btn">
+                	<button id="button" class="btn btn-default" type="submit">GO</button>
+           		</span>
+        	</div>
+    	</div>
+	<div id="result"></div>
+	<!--<pre>RISULTATI<div id="raw"></div></pre>-->
+	</form>
     
     <script>
     function select() {
+    	alert('select');
     	xmlhttpPost_select("/collection1/select");
     }
     
     function xmlhttpPost_select(strURL) {
+    	alert('xmlhttpPost_select');
         var xmlHttpReq = false;
         var self = this;
         if (window.XMLHttpRequest) { // Mozilla/Safari
@@ -62,7 +62,7 @@
     }
     
     function select_ok(str_json_select,q_old){
-    	//updatepage(str_json_select);
+    	alert('select_ok');
     	xmlhttpPost_spell("/collection1/spell",str_json_select,q_old);
     }
     
@@ -92,7 +92,7 @@
     	var json = JSON.parse(str_json_spell);
         q="";
         if (json.spellcheck.suggestions.length !=0) { 
-        	alert(json.spellcheck.suggestions[0]);
+        	//alert(json.spellcheck.suggestions[0]);
         	var q_old_parole = q_old.split(" ");
         	q=q_old;
             i=0;
@@ -109,8 +109,8 @@
 	           i++;
            }
         }
-        alert('vecchia '+q_old);
-        alert('nuova '+q);
+        //alert('vecchia '+q_old);
+        //alert('nuova '+q);
         xmlhttpPost_ReSelect("/collection1/select",q,str_json_select)
         
     }
@@ -146,11 +146,11 @@
         alert('new'+numFound_new);
         if(numFound_old>=numFound_new) {
         	alert('vecchi')
-        	updatepage(str_json_select_old);
+        	updatepage(str_json_select_old,null,null);
         }
         else {
         	alert('nuovi');
-        	updatepage(str_json_select_new);
+        	updatepage(str_json_select_new,json_old.responseHeader.params.q,json_new.responseHeader.params.q);
         }
     }
 
@@ -184,14 +184,31 @@
         //alert("getquery");
         return qstr;
     }
-
+    
+    function select_base() {
+    	alert("ciao");
+    	xmlhttpPost_select("");	
+    }
+    
+	</script>
+	<!--<form style="display:none" name="f2" onsubmit='select_base(); return false;'>
+  		<button id="button2" class="btn btn-default" type="submit">Dejavu?</button>
+	<div id="result"></div></form>-->
+	<script>
+	
     // this function does all the work of parsing the solr response and updating the page.
-    function updatepage(str){
+    function updatepage(str,q_old,q_new){
         //alert(str);
+        if(q_old!=null && q_new!=null) {
+        	var stampata ='<br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Risultati relativi a '+q_new+'</h4>';
+        	stampata+= "<form style='display:none' name='f2' onsubmit='select_base(); return false;'> <button id='button2' class='btn btn-default' type='submit'>Dejavu?</button></form>";
+        		
+        }
+        
         var json = JSON.parse(str);
         //document.getElementById("raw").innerHTML = str; STAMPA I RISULTATI DI SOLR
         var rsp = eval("("+str+")"); // use eval to parse Solr's JSON response
-        var stampata= '<br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
+        stampata += '<br> <h4 style="color:#1E90FF;margin-top:-20px; margin-bottom:40px"> &nbsp &nbsp Circa ' + rsp.response.numFound +' risultati </h4>'; //QUI SE NUMFOUND > 1
         
         //GESTIONE DEL RISULTATO
         var numeroRisultati = rsp.response.numFound;
@@ -272,6 +289,9 @@
         var titleBodyLittle = [titolo_corto, body_corto];
         return titleBodyLittle;
     }
+    
+    
+	
     </script>
 
 </body>
